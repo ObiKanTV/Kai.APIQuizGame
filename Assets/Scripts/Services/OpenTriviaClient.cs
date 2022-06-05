@@ -11,17 +11,13 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Clients
 {
-    public class QuestionsAPIService
+    public class OpenTriviaClient
     {
         HttpClient client;
 
-        public QuestionsAPIService()
+        public OpenTriviaClient()
         {
             client = new HttpClient();
-        }
-
-        public async Task RunAsync()
-        {
             client.BaseAddress = new Uri("https://opentdb.com/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
@@ -38,7 +34,7 @@ namespace Assets.Scripts.Clients
             return await GetQuestionsAsync(queryBuilder.ToString());
         }
 
-        public async Task<IEnumerable<Question>> GetQuestionsAsync(string path)
+        private async Task<IEnumerable<Question>> GetQuestionsAsync(string path)
         {
             List<Question> questions = new List<Question>();
 
