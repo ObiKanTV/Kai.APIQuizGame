@@ -8,8 +8,15 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("MenuSettings")]
+    [SerializeField] TMP_Dropdown difficulty;
+    [SerializeField] TMP_Dropdown categories;
+    [SerializeField] Button startButton;
+
+
     [Header("Questions")]
     [SerializeField] TextMeshProUGUI questionText;
+    [SerializeField] TextMeshProUGUI questionLabel;
     [SerializeField] List<Question> questions = new List<Question>();
     Question currentQuestion;
 
@@ -38,7 +45,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-
+        
         
     }
 
