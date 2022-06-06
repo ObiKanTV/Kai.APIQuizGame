@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Scoring")]
     [SerializeField] TextMeshProUGUI scoreText;
-    QuizResult result;
+    [SerializeField] QuizResult result = new();
 
     //[Header("ProgressBar")]
     //[SerializeField] Slider progressBar;
