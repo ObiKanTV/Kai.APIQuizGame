@@ -6,8 +6,8 @@ public class MenuSettings : MonoBehaviour
 {
     public GameObject menu;
 
-    [SerializeField] string category;
-    [SerializeField] string difficulty;
+    [SerializeField] public string category;
+    [SerializeField] public string difficulty;
 
 
     async void Start()

@@ -9,9 +9,10 @@ namespace Assets.Scripts.Entitites
 {
     public class Quiz
     {
-        public ICollection<Question> Questions { get; set; }
+        public Question[] Questions { get; set; } = new Question[10];
         public APIQuerySettings Settings { get; set; }
         public QuizResult Result { get; set; }
+
 
     }
 }

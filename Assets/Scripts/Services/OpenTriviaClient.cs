@@ -67,7 +67,7 @@ namespace Assets.Scripts.Clients
 
         private static string QueryBuilder(int? category, string difficulty, int count)
         {
-            var queryBuilder = new StringBuilder($"api.php?amount{count}&type=multiple");
+            var queryBuilder = new StringBuilder($"api.php?amount={count}&type=multiple");
 
             if (difficulty != null) queryBuilder = queryBuilder.Append($"&difficulty={difficulty}");
             if (category != null) queryBuilder = queryBuilder.Append($"&category={category}");
