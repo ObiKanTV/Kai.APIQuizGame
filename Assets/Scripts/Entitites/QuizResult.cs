@@ -9,7 +9,8 @@ namespace Assets.Scripts.Entitites
     public class QuizResult
     {
         public int NumberOfQuestions { get; set; } = 10;
-        public int CorrectAnswers { get; set; }
+        public int CorrectAnswers { get; set; } = 0;
+        public int AnsweredQuestions { get; set; } = 0;
 
 
     }

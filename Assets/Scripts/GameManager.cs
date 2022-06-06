@@ -1,6 +1,7 @@
 using Assets.Scripts.Clients;
 using Assets.Scripts.Entitites;
-using Bogus;
+using Assets.Scripts.Interfaces;
+using Assets.Scripts.Services;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,13 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("GameSettings")]
+    [SerializeField] int numberOfQuestions = 10;
+    [SerializeField] int correctAnswerDisplayTime = 5;
+
+
     [Header("MenuSettings")]
-    [SerializeField] TMP_Dropdown difficulty;
-    [SerializeField] TMP_Dropdown categories;
+    
     [SerializeField] Button startButton;
     [SerializeField] MenuSettings menuSettings;
 
@@ -23,10 +28,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] List<Question> questions = new List<Question>();
     Question currentQuestion;
     [SerializeField] string currentCorrectAnswer;
+    [SerializeField] int currentCorrectAnswerIndex = 0;
     [SerializeField] int currentQuestionIndex = 0;
 
     [Header("Answers")]
-    [SerializeField] GameObject[] answerButtons;
+    [SerializeField] Button[] answerButtons;
     bool hasAnsweredEarly = true;
 
     [Header("Button Colors")]
@@ -35,12 +41,18 @@ public class GameManager : MonoBehaviour
 
     //[Header("Timer")]
     //[SerializeField] Image timerImage;
-    
+
+    [Header("Components")]
+    [SerializeField] Canvas mainMenu;
+    [SerializeField] Canvas quizCanvas;
+    [SerializeField] Canvas endResults;
+    [SerializeField] TMP_Dropdown difficulty;
+    [SerializeField] TMP_Dropdown categoryDropdown;
 
     [Header("Scoring")]
     [SerializeField] TextMeshProUGUI scoreText;
     Quiz quiz;
-    Faker faker = new Faker("en");
+    IUI ui;
 
     //[Header("ProgressBar")]
     //[SerializeField] Slider progressBar;
@@ -51,17 +63,17 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         client = new OpenTriviaClient();
-        
+        ui = new UI(answerButtons, categoryDropdown, questionText);
     }
 
-    
     void Update()
     {
         
     }
+
     public async void OnQuizStart()
     {
-        quiz = new Quiz();
+        quiz = new Quiz(numberOfQuestions);
         List<Question> temp = await client.GetQuestionsInitAsync(15, null, 10) as List<Question>;
 
         for (int i = 0; i < temp.Count; i++)
@@ -69,20 +81,43 @@ public class GameManager : MonoBehaviour
             quiz.Questions[i] = temp[i];
         }
 
-        //foreach (var question in quiz.Questions)
-        //{
-        //    Debug.Log(question.QuestionString);
-        //    Debug.Log(question.CorrectAnswer);
-        //    foreach (var incorrectAnswer in question.IncorrectAnswers)
-        //    {
-        //        Debug.Log(incorrectAnswer);
-        //    }
-        //}
-    }
+        GetNextQuestion();
+        mainMenu.gameObject.SetActive(false);
+        quizCanvas.gameObject.SetActive(true);
 
-    void OnAnswerSelect()
+    }
+    public void BackToMainMenu()
     {
 
+    }
+
+    public void OnAnswerSelect(int index)
+    {
+        UpdateQuestionIndex();
+        quiz.Result.AnsweredQuestions++;
+        if (index == currentCorrectAnswerIndex) CorrectAnswer();
+        else IncorrectAnswer();
+
+        if (quiz.Result.AnsweredQuestions < quiz.Result.NumberOfQuestions) GetNextQuestion();
+        else EndGameResult();
+    }
+
+    private void EndGameResult()
+    {
+        quizCanvas.gameObject.SetActive(false);
+        endResults.gameObject.SetActive(true);
+    }
+
+    void IncorrectAnswer()
+    {
+
+        DisplayAnswer();
+    }
+    void CorrectAnswer()
+    {
+        
+        quiz.Result.CorrectAnswers++;
+        DisplayAnswer();
     }
     
     void DisplayAnswer()
@@ -94,42 +129,19 @@ public class GameManager : MonoBehaviour
     {
         currentQuestion = quiz.Questions[currentQuestionIndex];
         currentCorrectAnswer = currentQuestion.CorrectAnswer;
-        questionText.SetText(currentQuestion.QuestionString);
+        ui.SetQuestionText(currentQuestion.QuestionString);
+        SetAnswerButtonTexts();
     }
     void SetAnswerButtonTexts()
     {
-        int correctAnswerIndex = faker.Random.Int(0, 3);
-        switch (correctAnswerIndex)
-        {
-            case 0:
-
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            default:
-                break;
-        }
-
-
-
+        currentCorrectAnswerIndex = Random.Range(0, 3);
+        ui.SetAnswerButtonTexts(currentQuestion, currentCorrectAnswerIndex);
     }
     void UpdateQuestionIndex()
     {
         currentQuestionIndex++;
     }
 
-    void SetButtonState(bool state)
-    {
-        for (int i = 0; i < answerButtons.Length; i++)
-        {
-            Button button = answerButtons[i].GetComponent<Button>();
-            button.interactable = state;
-        }
-    }
     void SetDefaultButtonSprites()
     {
         for (int i = 0; i < answerButtons.Length; i++)
